@@ -1,4 +1,4 @@
-#Itscrap
+# Itscrap
 
 **Itscrap** is a nodejs library whose aim is to help you scrap web listings very easily.
 
@@ -24,6 +24,8 @@ npm install --save itscrap
 
 
 ## Usage
+
+#### If you prefer code than documentation, check out the examples folder.
 
 Let's scrap a listing of flats from Craigslist. The first thing we need to do is to create our scraper class and make it inherit from Itscrap.
 
