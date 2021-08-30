@@ -1,6 +1,6 @@
-# Itscrap
+# node-scrap
 
-**Itscrap** is a nodejs library whose aim is to help you scrap web listings very easily.
+**node-scrap** is a nodejs library whose aim is to help you scrap web listings very easily.
 
 
 
@@ -9,12 +9,12 @@
 Go to your project folder and run:
 
 ```sh
-npm install --save itscrap
+npm install --save node-scrap
 ```
 
 ## Introduction
 
-*Itscrap* is designed to sequentially scrap lists of web pages. It does it with a scraping loop. And this loop looks like this:
+*node-scrap* is designed to sequentially scrap lists of web pages. It does it with a scraping loop. And this loop looks like this:
 
 1. Get the next page to be scraped.
 2. Scrap it (extracts the data)
@@ -27,12 +27,12 @@ npm install --save itscrap
 
 #### If you prefer code than documentation, check out the examples folder.
 
-Let's scrap a listing of flats from Craigslist. The first thing we need to do is to create our scraper class and make it inherit from Itscrap.
+Let's scrap a listing of flats from Craigslist. The first thing we need to do is to create our scraper class and make it inherit from node-scrap.
 
 ```js
-const Itscrap = require('itscrap');
+const Scrapper = require('node-scrap');
 
-class CraigslistScraper extends Itscrap { }
+class CraigslistScraper extends Scrapper { }
 ```
 
 Before instantiating and running this scraper we need to define some logic into it.
@@ -40,7 +40,7 @@ Before instantiating and running this scraper we need to define some logic into 
 When we run our scraper, the first thing it will do is to call the `getNextUrl()` method. So, let's define it.
 
 ```js
-class CraigslistScraper extends Itscrap { 
+class CraigslistScraper extends Scrapper { 
 	getNextUrl() {
 		return `https://newyork.craigslist.org/search/aap?s=${this.params.offset}`;
 	}
@@ -49,10 +49,10 @@ class CraigslistScraper extends Itscrap {
 
 In this method we must return the URL of the site to be scraped next. This is just the flats listing page URL from Craigslist but you can see that we are using an "offset" value from the `this.params` object. 
 
-*Itscrap* allows you to set an initial value for these params using the `getInitialParams()` method. So, let's initialize our listing offset with a value of 0.
+*node-scrap* allows you to set an initial value for these params using the `getInitialParams()` method. So, let's initialize our listing offset with a value of 0.
 
 ```js
-class CraigslistScraper extends Itscrap { 
+class CraigslistScraper extends Scrapper { 
 	getInitialParams() {
 		return { offset: 0 };
 	}
@@ -62,10 +62,10 @@ class CraigslistScraper extends Itscrap {
 ```
 
 
-After fetching the page returned by `getNextUrl()`, *Itscrap* will convert the site to a [cheerio](https://github.com/cheeriojs/cheerio) instance to facilitate DOM manipulation. Next, it will call `scrap()` method with the cheerio instance and the url of the site being scraped.
+After fetching the page returned by `getNextUrl()`, *node-scrap* will convert the site to a [cheerio](https://github.com/cheeriojs/cheerio) instance to facilitate DOM manipulation. Next, it will call `scrap()` method with the cheerio instance and the url of the site being scraped.
 
 ```js
-class CraigslistScraper extends Itscrap { 
+class CraigslistScraper extends Scrapper { 
 	getInitialParams() { ... }
 	getNextUrl() { ... }
 	
@@ -100,7 +100,7 @@ Now we have a scrap method that extracts the title and the price information fro
 However, altough this scraper extracts the data from Craigslist, it does nothing with it. Now we need to implement the `process(data)` method, which takes the return value of `scrap()` as a first argument.
 
 ```js
-class CraigslistScraper extends Itscrap { 
+class CraigslistScraper extends Scrapper { 
 	getInitialParams() { ... }
 	getNextUrl() { ... }
 	scrap($, url) { ... }
@@ -115,7 +115,7 @@ Here we told the scraper to print the extracted data to the console after it has
 Lastly, before running the scraper we need to update the `this.params.offset` value, otherwise it will scrap the same page indefinitely. We can do that in the `afterEach()` method. This method will be executed after the `process()` method for each scraped web page.
 
 ```js
-class CraigslistScraper extends Itscrap { 
+class CraigslistScraper extends Scrapper { 
 	getInitialParams() { ... }
 	getNextUrl() { ... }
 	scrap($, url) { ... }
