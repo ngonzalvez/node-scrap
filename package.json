@@ -1,6 +1,6 @@
 {
   "name": "node-scrap",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Scrapping library",
   "main": "src/node-scrap.js",
   "scripts": {
