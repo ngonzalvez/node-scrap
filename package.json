@@ -1,6 +1,6 @@
 {
   "name": "node-scrap",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Scraping paginated data made easy",
   "main": "lib/node-scrap.js",
   "types": "lib/node-scrap.d.ts",
