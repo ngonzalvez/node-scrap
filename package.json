@@ -1,13 +1,20 @@
 {
   "name": "node-scrap",
   "version": "2.0.0",
-  "description": "Scrapping library",
-  "main": "src/node-scrap.js",
+  "description": "Scraping paginated data made easy",
+  "main": "lib/node-scrap.js",
+  "types": "lib/node-scrap.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "scrap",
+    "scraping",
+    "data",
+    "automation"
+  ],
+  "author": "Nicolas Gonzalvez <n@gonzalvez.com.uy>",
   "license": "MIT",
   "dependencies": {
     "@types/axios": "^0.14.0",
