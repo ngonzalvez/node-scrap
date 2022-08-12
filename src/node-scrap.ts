@@ -20,22 +20,7 @@ import cheerio from "cheerio";
  */
 class Scraper {
   isStopped: boolean = false;
-  state: Record<string, any>;
-
-  constructor() {
-    this.state = this.getInitialParams();
-  }
-
-  /**
-   * Provides the default values for scraper state.
-   *
-   * Use the `state` property to store metadata that you want to share across methods.
-   *
-   * @returns the initial state for the state.
-   */
-  getInitialParams(): Record<string, any> | Promise<Record<string, any>> {
-    return {};
-  }
+  state: Record<string, any> = {};
 
   /**
    * Generates the next URL to be scraped.
