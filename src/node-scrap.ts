@@ -33,7 +33,7 @@ class Scraper {
    *
    * @returns the initial state for the state.
    */
-  async getInitialParams(): Promise<Record<string, any>> {
+  getInitialParams(): Record<string, any> | Promise<Record<string, any>> {
     return {};
   }
 
@@ -45,7 +45,7 @@ class Scraper {
    *
    * @returns the URL of the next page to be scrapped.
    */
-  async getNextUrl(): Promise<string> {
+  getNextUrl(): string | Promise<string> {
     throw new Error("Your scraper class must implement getNextUrl()");
   }
 
@@ -59,7 +59,7 @@ class Scraper {
    * @param $ - cheerio instance at the root of the page.
    * @returns the scraped data.
    */
-  async extract($: cheerio.Root): Promise<any> {
+  extract($: cheerio.Root): any | Promise<any> {
     throw new Error("Your scraper class must implement the scrap() method");
   }
 
@@ -72,7 +72,7 @@ class Scraper {
    *
    * @param data - the scraped data.
    */
-  async process(data: any): Promise<void> {
+  process(data: any): void | Promise<void> {
     console.log("Scraped data:", data);
   }
 
@@ -81,7 +81,7 @@ class Scraper {
    *
    * If you need to update the `currentPage` number in the `state` property, this is where you do need to do it.
    */
-  async afterEach(): Promise<void> {}
+  afterEach(): Promise<void> | void {}
 
   /**
    * Stops the scraping loop.
