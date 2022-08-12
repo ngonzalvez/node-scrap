@@ -1,8 +1,6 @@
 # node-scrap
 
-**node-scrap** is a nodejs library whose aim is to help you scrap web listings very easily.
-
-
+**node-scrap** is a scraping framework that makes it really easy to scrap paginated listings. It provides a base `Scraper` class that takes care of the inner workings of scraping and lets you focus on what really matter: extracting and processing the data you need.
 
 ## Instalation
 
@@ -14,132 +12,125 @@ npm install --save node-scrap
 
 ## Introduction
 
-*node-scrap* is designed to sequentially scrap lists of web pages. It does it with a scraping loop. And this loop looks like this:
+_node-scrap_ is actually really simple. It simply loops through the following steps:
 
-1. Get the next page to be scraped.
-2. Scrap it (extracts the data)
+1. Get the URL of the page to be extracted.
+2. Extract the data from the DOM.
 3. Process the extracted data.
-4. Execute an optional post-processing function.
-5. If the user didn't stop the scraper, go back to (1).
+4. Runs a post-processing or cleanup step.
+5. Repeat.
 
+It's that simple!
 
 ## Usage
 
-#### If you prefer code than documentation, check out the examples folder.
+#### Extend the `Scraper` class
 
-Let's scrap a listing of flats from Craigslist. The first thing we need to do is to create our scraper class and make it inherit from node-scrap.
+The first thing we need to do is to import _node-scrap_ and extend the `Scraper` class.
 
-```js
-const Scrapper = require('node-scrap');
+```typescript
+import Scrapper from "node-scrap";
 
-class CraigslistScraper extends Scrapper { }
-```
-
-Before instantiating and running this scraper we need to define some logic into it.
-
-When we run our scraper, the first thing it will do is to call the `getNextUrl()` method. So, let's define it.
-
-```js
-class CraigslistScraper extends Scrapper { 
-	getNextUrl() {
-		return `https://newyork.craigslist.org/search/aap?s=${this.params.offset}`;
-	}
+class HackerNewsScraper extends Scraper {
+  // Let's define the initial state of the pagination.
+  state = { currentPage: 1 };
 }
 ```
 
-In this method we must return the URL of the site to be scraped next. This is just the flats listing page URL from Craigslist but you can see that we are using an "offset" value from the `this.params` object. 
+#### Formatting The URL
+Now, let's format the URL of the first page we'll scrap. In order to do that, extend the `getNextUrl()` method and use the data in `this.state` to create the URL.
 
-*node-scrap* allows you to set an initial value for these params using the `getInitialParams()` method. So, let's initialize our listing offset with a value of 0.
-
-```js
-class CraigslistScraper extends Scrapper { 
-	getInitialParams() {
-		return { offset: 0 };
-	}
-
-	getNextUrl() { ... }
+```typescript
+class HackerNewsScraper extends Scraper {
+  // ...
+  getNextUrl() {
+  	return `https://news.ycombinator.com/news?p=${this.state.currentPage}`;
+  }
 }
 ```
 
 
-After fetching the page returned by `getNextUrl()`, *node-scrap* will convert the site to a [cheerio](https://github.com/cheeriojs/cheerio) instance to facilitate DOM manipulation. Next, it will call `scrap()` method with the cheerio instance and the url of the site being scraped.
+#### Extracting Data From The DOM
+The next step is to extend the `extract($)` method and scrap some data from the page. This method takes a Cheerio instance, which is really similar to JQuery. Use it to extract the data you need. Once you are done extracting the data, `return` it to be processed in the next step.
 
-```js
-class CraigslistScraper extends Scrapper { 
-	getInitialParams() { ... }
-	getNextUrl() { ... }
-	
-	scrap($, url) {
-		console.log('Scraping', url);
-	
-		// Get all the items in the list.
-		const listItems = $('.result-row');
-		const flatsData = [];
-		
-		// If the list is empty, stop the scraper.
-		if (listItems.length === 0) this.stop();
-		
-		listItems.each(function() {
-			// Wrap the current element in a cheerio instance.
-			const el = $(this);	
-			const title = 
-	
-			flatsData.push({
-				title: el.find('.result.title').text(),
-				price: el.find('.result.price').text()
-			});
-		});
-		
-		return flatsData;
-	}
+```typescript
+class HackerNewsScraper extends Scraper {
+  // ...
+  extract($) {
+    // Extract the title of each article.
+    return $('.titlelink').map(link => $(link).text());
+  }
 }
 ```
 
-Now we have a scrap method that extracts the title and the price information from each item in the listing. Also, once it has ran out of results (i.e. it got to the end of the listing) it calls `this.stop()` to stop the scraper.
+In this example we are simply extracting the title of the article, but we could be extracting the URL for each article for further processing. 
 
-However, altough this scraper extracts the data from Craigslist, it does nothing with it. Now we need to implement the `process(data)` method, which takes the return value of `scrap()` as a first argument.
+#### Processing The Extracted Data
+Now that we extracted some data, we need to process it. To keep it simple, we'll print it on the screen, but you could be storing this data in a database, doing sentiment analysis, using it to train a neural network, or anything else.
 
-```js
-class CraigslistScraper extends Scrapper { 
-	getInitialParams() { ... }
-	getNextUrl() { ... }
-	scrap($, url) { ... }
-	
-	process(data) {
-		data.forEach(flat => console.log(`${flat.price} - ${flat.title}`));
-	}
+In order to do that, we'll extend the `process(data)` method that takes the value returned by the `extract()` method.
+
+```typescript
+class HackerNewsScraper extends Scraper {
+  // ...
+  process(articles) {
+    articles.forEach(title => console.log(`- ${title}`));
+  }
+}
 ```
 
-Here we told the scraper to print the extracted data to the console after it has finished scraping the current page. This may not seem really useful, but you could be storing it in a database, or extracting the URL of the flat detail page and pushing it into a queue to be scraped by another scraper.
+#### Moving On
+Now that we've successfully scrapped the first page of HackerNews, we need to move on to the next page. Let's extend the `afterEach()` method to do that.
 
-Lastly, before running the scraper we need to update the `this.params.offset` value, otherwise it will scrap the same page indefinitely. We can do that in the `afterEach()` method. This method will be executed after the `process()` method for each scraped web page.
-
-```js
-class CraigslistScraper extends Scrapper { 
-	getInitialParams() { ... }
-	getNextUrl() { ... }
-	scrap($, url) { ... }
-	process(data) { ... }
-	
-	afterEach() {
-		// Note: Craigslist pagination size is 120.
-		this.params.offset += 120;
-	}
+```typescript
+class HackerNewsScraper extends Scraper {
+  // ...
+  afterEach() {
+    this.state.currentPage++;
+  }
+}
 ```
 
-And that's it. All you have to do now is to instantiate the scraper and run it.
+That's it. If you created temporary files while processing the data, you can also use this method to clean up.
 
-```js
-const scraper = new CraigslistScraper();
+#### That's It!
+Now you have succesfully implemented a scraper that will scrap the data from all HackerNews pages. Let's run it.
+
+```typescript
+const scraper = new HackerNewsScraper();
 scraper.run();
 ```
 
-### Debugging
+If you execute this code, you should see articles being printed to the console as they are scraped from HackerNews. Isn't that awesome? But wait... I think we may have a problem... It runs forever! 
 
-If, for some reason, you need to see what's going on at a deeper level, you can increase the logging level with `setLogLevel()`. Currently there are three levels (0, 1 and 2) with 0 being no logging and 2 being the most verbose.
+Don't worry, there's a way to stop it, I swear! Actually it's as simple as calling the `stop()` method. You may want to update your `process()` implementation to stop if we've got an empty page with no articles. It would look something like this:
 
-```js
-const scraper = new CraigslistScraper();
-scraper.setLogLevel(2);
-scraper.run();
+```typescript
+process(articles) {
+  if (articles.length === 0) this.stop();
+  
+  // ...
+}
 ```
+
+Now everything should be fine. 
+
+## Building More Advanced Projects
+In our example we simply extracted the title of the articles from HackerNews. However, a real world situation you're implementation would have much greater complexity. You may be wondering how you can scale things up. There's a lot of approaches but let me show you a simple one.
+
+Let's say you want to parse real estate information from Zillow. In this case, you'll need to implement two scrapers: one for the listing, and another for the detail page. The listing scraper will simple traverse the listing pagination and it will extract links. Once you have the links, you can push them to a database or to a message queue using the `process()` method. The second scraper, the one for the detail page, will take one of those links from the database or message queue in `getNextUrl()`, scrap the data for the property (in the `extract()` method) and store it in a database (in the `process()` method).
+
+These two scrapers could run one after the other, or they could be running in parallel, passing the data around in real-time. In fact, you could have many nodes running simultaneously to parallelize the work.
+
+#### Promises
+_node-scrap_ also supports promises. So, if you need to do some asynchronous work, like waiting for a message to show up in the message queue, you can do that by making the extended functions `async`. It would looks something like this.
+
+```typescript
+async getNextUrl() {
+  const {url} = await messageQueue.readMessage();
+  return url;
+}
+```
+
+## Comments and Suggestions
+This is a personal project I started to make my life easier when scraping data around the internet. It's not perfect, and for sure it could be improved. I would love to hear your ideas and suggestions for the project. Feel free to create an issue if there's something you think could be done differently.
