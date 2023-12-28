@@ -1,5 +1,5 @@
 <h3 align="center">node-scrap</h3>
-<p align="center">Scrap paginated listings in no time.</p>
+<p align="center">Scrap paginated listings in no time</p>
 <h1></h1>
 
 &nbsp;
