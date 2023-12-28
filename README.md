@@ -86,6 +86,7 @@ scraper.run();
 ```
 
 You should see articles printed to the console as they are scraped from HackerNews. Isn't that awesome? 
+
 &nbsp;
 #### Promises
 _node-scrap_ also supports promises. So, if you need to do some asynchronous work, like waiting for a message to show up in the message queue, you can do that by making the extended functions `async`. It would looks something like this.
