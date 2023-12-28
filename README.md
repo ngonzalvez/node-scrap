@@ -3,7 +3,7 @@
 <h1></h1>
 
 &nbsp;
-### Instalation
+#### Instalation
 
 Go to your project folder and run:
 
@@ -12,7 +12,7 @@ npm install --save node-scrap
 ```
 
 &nbsp;
-### How does it work?
+#### How does it work?
 
 _node-scrap_ is actually really simple. You simply extend the `Scraper` class, implement 
 
@@ -25,7 +25,7 @@ _node-scrap_ is actually really simple. You simply extend the `Scraper` class, i
 It's that simple!
 
 &nbsp;
-### Usage
+#### Usage
 
 The first thing we need to do is to import `node-scrap` and extend the `Scraper` class.
 
@@ -86,15 +86,7 @@ scraper.run();
 ```
 
 You should see articles printed to the console as they are scraped from HackerNews. Isn't that awesome? 
-
 &nbsp;
-### Building More Advanced Projects
-In our example we simply extracted the title of the articles from HackerNews. However, a real world situation you're implementation would have much greater complexity. You may be wondering how you can scale things up. There's a lot of approaches but let me show you a simple one.
-
-Let's say you want to parse real estate information from Zillow. In this case, you'll need to implement two scrapers: one for the listing, and another for the detail page. The listing scraper will simple traverse the listing pagination and it will extract links. Once you have the links, you can push them to a database or to a message queue using the `process()` method. The second scraper, the one for the detail page, will take one of those links from the database or message queue in `getNextUrl()`, scrap the data for the property (in the `extract()` method) and store it in a database (in the `process()` method).
-
-These two scrapers could run one after the other, or they could be running in parallel, passing the data around in real-time. In fact, you could have many nodes running simultaneously to parallelize the work.
-
 #### Promises
 _node-scrap_ also supports promises. So, if you need to do some asynchronous work, like waiting for a message to show up in the message queue, you can do that by making the extended functions `async`. It would looks something like this.
 
@@ -105,5 +97,16 @@ async getNextUrl() {
 }
 ```
 
-## Comments and Suggestions
+&nbsp;
+#### Building More Advanced Projects
+In our example we simply extracted the title of the articles from HackerNews. However, a real world situation you're implementation would have much greater complexity. You may be wondering how you can scale things up. There's a lot of approaches but let me show you a simple one.
+
+Let's say you want to parse real estate information from Zillow. In this case, you'll need to implement two scrapers: one for the listing, and another for the detail page. The listing scraper will simple traverse the listing pagination and it will extract links. Once you have the links, you can push them to a database or to a message queue using the `process()` method. The second scraper, the one for the detail page, will take one of those links from the database or message queue in `getNextUrl()`, scrap the data for the property (in the `extract()` method) and store it in a database (in the `process()` method).
+
+These two scrapers could run one after the other, or they could be running in parallel, passing the data around in real-time. In fact, you could have many nodes running simultaneously to parallelize the work.
+
+
+
+&nbsp;
+#### Comments and Suggestions
 This is a personal project I started to make my life easier when scraping data around the internet. It's not perfect, and for sure it could be improved. I would love to hear your ideas and suggestions for the project. Feel free to create an issue if there's something you think could be done differently.
